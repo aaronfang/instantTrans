@@ -3,6 +3,7 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 
 SET project_path=%~dp0
+SET "shortcut_path=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup" 
 
 echo 检查VENV...
 IF NOT EXIST "%project_path%\venv\" (
@@ -15,8 +16,12 @@ echo 安装依赖...
 "%project_path%\venv\Scripts\python" -m pip install -r "%project_path%\requirements.txt"
 
 echo 将快捷方式复制到启动文件夹...
-mklink "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\instantTrans.lnk" "%project_path%\instantTrans.exe"
-
+if not exist "%shortcut_path%" (
+    echo Shortcut not found. Creating...
+    mklink "%shortcut_path%instantTrans.lnk" "%project_path%instantTrans.exe"
+) else (
+    echo Shortcut already exists.
+)
 echo 启动应用程序...
 rem 如果程序已经启动，那么不会再次启动
 
