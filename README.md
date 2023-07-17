@@ -16,4 +16,6 @@ git clone https://github.com/aaronfang/instantTrans.git
 
 3. 安装结束后，会自动运行`instantTrans.exe`，此时会在系统托盘中出现一个小图标。（同时会在启动文件夹中创建快捷方式，以便开机启动） 
 
-4. 选中需要翻译的文字，按下快捷键即可翻译。
+4. 选中需要翻译的文字，按下快捷键即可翻译  
+
+![image](https://github.com/aaronfang/instantTrans/blob/main/demo.gif)
