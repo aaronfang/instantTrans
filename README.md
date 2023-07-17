@@ -18,4 +18,4 @@ git clone https://github.com/aaronfang/instantTrans.git
 
 4. 选中需要翻译的文字，按下快捷键即可翻译  
 
-![image]()
+![image](https://github.com/aaronfang/instantTrans/blob/main/demo.gif)
