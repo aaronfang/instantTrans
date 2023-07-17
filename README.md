@@ -3,19 +3,18 @@
 
 | 快捷键       | 功能   |
 |-------------|--------|
-| `alt`+`shift`+`[` | 英译中 |
-| `alt`+`shift`+`]` | 中译英 |
+| `ctrl`+`shift`+`[` | 英译中 |
+| `ctrl`+`shift`+`]` | 中译英 |
 
-## 安装(Windows)
-1. 克隆当前仓库到本地  
+## 安装(MacOS)
+1. 克隆分支仓库`macos`到本地  
 ```shell
-git clone https://github.com/aaronfang/instantTrans.git
+git clone -b macos https://github.com/aaronfang/instantTrans.git
 ```  
-
-2. 以**管理员身份**运行 `install.bat`，安装依赖包
-
-3. 安装结束后，会自动运行`instantTrans.exe`，此时会在系统托盘中出现一个小图标。（同时会在启动文件夹中创建快捷方式，以便开机启动） 
-
-4. 选中需要翻译的文字，按下快捷键即可翻译  
+2. 保存你的服务。(服务通常保存在`/Users/aaronfang/Library/Services/instant_trans.workflow`)
+3. 打开`系统偏好设置 -> 键盘 -> 快捷键 -> 服务 -> text`，为你的服务分配一个快捷键。（这里我设置的是`ctrl`+`shift`+`[`和`ctrl`+`shift`+`]`）
+4. 设置automator 和Terminal 的"Accessibility"（辅助功能）权限: `系统偏好设置 -> 安全性与隐私 -> 辅助功能` 添加 **Automator** 和 **Terminal** 这两个应用的权限。
+5. 设置automator 和Terminal 的"Full Disk Access"（完全磁盘访问）权限: `系统偏好设置 -> 安全性与隐私 -> 完全磁盘访问` 添加 **Automator** 和 **Terminal** 这两个应用的权限。
+6. 选中需要翻译的文字，按下快捷键即可翻译  
 
 ![image](https://github.com/aaronfang/instantTrans/blob/main/demo.gif)
