@@ -1,6 +1,7 @@
 import os
 import openai
 import pyperclip
+import argparse
 from googletrans import Translator
 
 openai.api_type = "azure"
@@ -29,15 +30,22 @@ def translate_text_openai(text):
         stop=None)
     return response.choices[0].message['content'].strip()
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--google", action="store_true")
+    parser.add_argument("--openai", action="store_true")
+    args = parser.parse_args()
 
-def main():
     text = pyperclip.paste()
-    try:
-        translated_text = translate_text_openai(text)
-    except Exception as e:
+
+    if args.google:
         translated_text = translate_text_google(text)
+    elif args.openai:
+        translated_text = translate_text_openai(text)
+    else:
+        try:
+            translated_text = translate_text_openai(text)
+        except Exception as e:
+            translated_text = translate_text_google(text)
 
     pyperclip.copy(translated_text)
-
-if __name__ == "__main__":
-    main()
