@@ -14,6 +14,14 @@
 git clone https://github.com/aaronfang/instantTrans.git
 ```  
 
+在环境变量中添加：
+```shell
+AZURE_API_BASE
+AZURE_API_KEY
+AZURE_API_VERSION
+AZURE_DEPLOYMENT_NAME
+```
+
 2. 以**管理员身份**运行 `install.bat`，安装依赖包
 
 3. 安装结束后，会自动运行`instantTrans.exe`，此时会在系统托盘中出现一个小图标。（同时会在启动文件夹中创建快捷方式，以便开机启动） 

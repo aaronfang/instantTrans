@@ -32,4 +32,4 @@ set p=!^
 
 
 !
-msg %username% /w "安装完成!p!快捷键: ctrl+shift+]!p!优先使用Azure的openai的服务来翻译!p!备用Google的翻译服务!p!Azure Openai服务需要设置环境变量：!p!AZURE_API_BASE!p!AZURE_API_KEY!p!AZURE_API_VERSION!p!AZURE_DEPLOYMENT_NAME"
+msg %username% /w "安装完成!p!快捷键: ctrl+shift+]!p!优先使用Azure的openai的服务来翻译!p!备用Google的翻译服务!p!Azure Openai服务需要设置环境变量：!p!AZURE_API_BASE!p!AZURE_API_KEY!p!AZURE_API_VERSION!p!AZURE_DEPLOYMENT_NAME
