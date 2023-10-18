@@ -5,23 +5,17 @@ setlocal enabledelayedexpansion
 SET project_path=%~dp0
 SET "shortcut_path=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup" 
 
-echo 检查VENV...
-IF NOT EXIST "%project_path%\venv\" (
-    echo 找不到虚拟环境。创建中...
-    python -m venv "%project_path%\venv"
-)
-
 echo 安装依赖...
-"%project_path%\venv\Scripts\python" -m pip install --upgrade pip
-"%project_path%\venv\Scripts\python" -m pip install -r "%project_path%\requirements.txt"
+pip install --upgrade pip
+pip install -r "%project_path%\requirements.txt"
 
 echo 将快捷方式复制到启动文件夹...
-if not exist "%shortcut_path%" (
-    echo Shortcut not found. Creating...
-    mklink "%shortcut_path%instantTrans.lnk" "%project_path%instantTrans.exe"
-) else (
-    echo Shortcut already exists.
+if exist "%shortcut_path%" (
+    echo Shortcut already exists. removing...
+    del "%shortcut_path%instantTrans.lnk"
 )
+mklink "%shortcut_path%instantTrans.lnk" "%project_path%instantTrans.exe"
+
 echo 启动应用程序...
 rem 如果程序已经启动，那么不会再次启动
 
@@ -32,10 +26,10 @@ if "%ERRORLEVEL%"=="0" (
     start "" "%project_path%\instantTrans.exe"
 )
 
-@REM 显示消息，下面的空行不能省略
+:: 显示消息，下面的空行不能省略
 
 set p=!^
 
 
 !
-msg %username% /w "安装完成!p!英译中: alt+shift+[!p!中译英: alt+shift+]"
+msg %username% /w "安装完成!p!快捷键: ctrl+shift+]!p!优先使用Azure的openai的服务来翻译!p!备用Google的翻译服务!p!Azure Openai服务需要设置环境变量：!p!AZURE_API_BASE!p!AZURE_API_KEY!p!AZURE_API_VERSION!p!AZURE_DEPLOYMENT_NAME"

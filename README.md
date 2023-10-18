@@ -1,10 +1,12 @@
 # instantTrans
-> 使用 googletrans package 把选中的文字快速`中译英`或者`英译中`，并替换之前选中的文字。
+> - 优先使用Azure的Openai服务来翻译选中文字，备用 googletrans package.   
+> - 把选中的文字快速`中译英`，并替换之前选中的文字。  
+> - Openai服务支持双向翻译，优先使用。  
+> - 适用于Windows系统，其他系统未测试。  
 
 | 快捷键       | 功能   |
 |-------------|--------|
-| `alt`+`shift`+`[` | 英译中 |
-| `alt`+`shift`+`]` | 中译英 |
+| `ctrl`+`shift`+`]` | 中译英 |
 
 ## 安装(Windows)
 1. 克隆当前仓库到本地  
