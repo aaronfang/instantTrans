@@ -28,4 +28,23 @@ AZURE_DEPLOYMENT_NAME
 
 4. 选中需要翻译的文字，按下快捷键即可翻译  
 
-![image](https://github.com/aaronfang/instantTrans/blob/main/demo.gif)
+### 设置SnipDo
+1. 下载并安装SnipDo  
+
+2. 在SnipDo的设置中`Create extension` > `Create a script-extension`
+
+3. 在`Script`中输入以下内容
+```shell
+cd c:\your\path\to\instantTrans
+python translate_snipdo.py --openai --message=$PLAIN_TEXT
+```
+or 使用google翻译服务
+```shell
+cd c:\your\path\to\instantTrans
+python translate_snipdo.py --google --message=$PLAIN_TEXT
+```
+4. 打开下方的`Advanced settings`，选择`PASTE_RESULT`或者`SHOW_RESULT`, 保存
+
+5. 在`Text extensions`列表中找到刚才创建的extension，开启后即可划词使用
+
+[![Demo Video](https://img.youtube.com/vi/INSERT_VIDEO_ID/0.jpg)](https://github.com/aaronfang/instantTrans/blob/main/demo_snipdo.mp4)
