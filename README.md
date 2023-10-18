@@ -47,4 +47,4 @@ python translate_snipdo.py --google --message=$PLAIN_TEXT
 
 5. 在`Text extensions`列表中找到刚才创建的extension，开启后即可划词使用
 
-[![Image](https://img.youtube.com/vi/INSERT_VIDEO_ID/0.jpg)](https://github.com/aaronfang/instantTrans/blob/main/demo_snipdo.gif)
+![Image](https://github.com/aaronfang/instantTrans/blob/main/demo_snipdo.gif)
