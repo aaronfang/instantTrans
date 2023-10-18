@@ -1,3 +1,6 @@
+![Image](https://github.com/aaronfang/instantTrans/blob/main/demo_snipdo.gif)
+
+
 # instantTrans
 > - 优先使用Azure的Openai服务来翻译选中文字，备用 googletrans package.   
 > - 把选中的文字快速`中译英`，并替换之前选中的文字。  
@@ -46,5 +49,3 @@ python translate_snipdo.py --google --message=$PLAIN_TEXT
 4. 打开下方的`Advanced settings`，选择`PASTE_RESULT`或者`SHOW_RESULT`, 保存
 
 5. 在`Text extensions`列表中找到刚才创建的extension，开启后即可划词使用
-
-![Image](https://github.com/aaronfang/instantTrans/blob/main/demo_snipdo.gif)
