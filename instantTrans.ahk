@@ -3,7 +3,7 @@
     clipboardBackup := ClipboardAll
     
     ; Define the path to the virtual environment and the Python script
-    venvPath := "python.exe"
+    venvPath := A_ScriptDir . "\venv\Scripts\python.exe"
     scriptPath := A_ScriptDir . "\translate.py"
     
     ; Copy selected text
