@@ -1,3 +1,4 @@
-googletrans==4.0.0-rc1
 pyperclip
+requests
+deep-translator
 openai
