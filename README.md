@@ -139,7 +139,6 @@ python translate_snipdo.py --google --message=$PLAIN_TEXT
 
 - Python 3.13+
 - pyperclip
-- requests
 - deep-translator
 - openai
 
