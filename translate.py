@@ -23,6 +23,56 @@ def translate_text_google(text: str) -> str:
         result = GoogleTranslator(source='auto', target='zh-CN').translate(text)
         return result if result else text
 
+def _get_windows_user_env(name: str) -> str | None:
+    if os.name != "nt":
+        return None
+    try:
+        import winreg
+
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+            value, _ = winreg.QueryValueEx(key, name)
+            return value or None
+    except OSError:
+        return None
+
+def _get_deepseek_api_key() -> str | None:
+    return os.getenv("DEEPSEEK_API_KEY") or _get_windows_user_env("DEEPSEEK_API_KEY")
+
+def translate_text_deepseek(text: str) -> str:
+    """使用 DeepSeek API 进行翻译"""
+    api_key = _get_deepseek_api_key()
+    if not api_key:
+        raise ValueError(
+            "请设置环境变量 DEEPSEEK_API_KEY\n"
+            "获取地址: https://platform.deepseek.com/api_keys"
+        )
+
+    try:
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.deepseek.com"
+        )
+
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": text}
+            ],
+            model="deepseek-chat",
+            temperature=0.7,
+            max_tokens=2000,
+            timeout=15
+        )
+        content = chat_completion.choices[0].message.content
+        return content.strip() if content else ""
+
+    except Exception as e:
+        if "401" in str(e) or "403" in str(e):
+            raise ValueError(
+                f"DeepSeek API 密钥无效。请访问 https://platform.deepseek.com/api_keys 重新生成\n错误: {e}"
+            )
+        raise
+
 def translate_text_siliconflow(text: str) -> str:
     """使用硅基流动API进行翻译 (国内免费API，更稳定)"""
     api_key = os.getenv("SILICONFLOW_API_KEY")
@@ -74,7 +124,8 @@ def translate_text_siliconflow(text: str) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--google", action="store_true", help="使用Google翻译（无需API密钥）")
-    parser.add_argument("--siliconflow", action="store_true", help="使用硅基流动API（国内免费，推荐）")
+    parser.add_argument("--deepseek", action="store_true", help="使用DeepSeek API（推荐）")
+    parser.add_argument("--siliconflow", action="store_true", help="使用硅基流动API（国内免费）")
     args = parser.parse_args()
 
     text = pyperclip.paste()
@@ -82,21 +133,26 @@ if __name__ == "__main__":
 
     try:
         if args.google:
-            # 明确指定使用Google
             translated_text = translate_text_google(text)
             used_api = "Google"
+        elif args.deepseek:
+            translated_text = translate_text_deepseek(text)
+            used_api = "DeepSeek"
         elif args.siliconflow:
-            # 明确指定使用SiliconFlow
             translated_text = translate_text_siliconflow(text)
             used_api = "SiliconFlow"
         else:
-            # 默认：优先SiliconFlow，失败时降级到Google
+            # 默认：DeepSeek -> SiliconFlow -> Google
             try:
-                translated_text = translate_text_siliconflow(text)
-                used_api = "SiliconFlow"
+                translated_text = translate_text_deepseek(text)
+                used_api = "DeepSeek"
             except Exception:
-                translated_text = translate_text_google(text)
-                used_api = "Google"
+                try:
+                    translated_text = translate_text_siliconflow(text)
+                    used_api = "SiliconFlow"
+                except Exception:
+                    translated_text = translate_text_google(text)
+                    used_api = "Google"
         
         # 将翻译结果和使用的API信息都复制到剪贴板（用特殊分隔符）
         pyperclip.copy(f"{translated_text}|||{used_api}")
