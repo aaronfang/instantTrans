@@ -21,6 +21,7 @@ venv.bak/
 dist/
 build/
 *.tar.gz
+*.popclipextz
 
 # instantTrans 运行时生成
 config.ini

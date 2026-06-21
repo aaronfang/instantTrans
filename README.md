@@ -4,18 +4,18 @@
 > - 把选中的文字快速**中英互译**，并替换之前选中的文字  
 > - AI 翻译支持双向翻译，自动识别语言  
 > - 兼容 Python 3.13+ / 3.14  
-> - 适用于 Windows 系统
+> - 支持 **Windows**（AutoHotkey）与 **macOS**（PopClip）
 
 ## ✨ 特性
 
 - 🎯 **多服务支持**：DeepSeek + 硅基流动 + Google + 本地模型（HY-MT1.5）
 - 🖥️ **本地离线翻译**：基于 [HY-MT1.5-1.8B-ONNX](https://huggingface.co/onnx-community/HY-MT1.5-1.8B-ONNX)，无需联网、无需 API 密钥
-- 🖱️ **托盘菜单选择**：任务栏右键即可切换默认翻译服务（自动记忆）
+- 🖱️ **托盘 / PopClip 菜单**：Windows 任务栏托盘或 macOS PopClip 中切换默认翻译服务
 - 🔄 **智能降级**：DeepSeek → 硅基流动 → Google → 本地模型，失败时自动切换
 - 🆓 **完全免费**：所有方案都免费可用
-- ⚡ **快捷操作**：`Ctrl+Shift+]` 一键翻译并替换
+- ⚡ **快捷操作**：Windows `Ctrl+Shift+]` / macOS PopClip 一键翻译并替换
 - 🌍 **智能互译**：自动识别中英文并翻译为对应语言
-- 💡 **即时反馈**：翻译后显示使用的服务（2.5 秒提示）
+- 💡 **即时反馈**：翻译后显示使用的服务（Windows 2.5 秒提示）
 
 ## 🚀 快速开始
 
@@ -27,6 +27,8 @@ cd instantTrans
 ```
 
 ### 2. 安装依赖
+
+#### Windows
 
 以**管理员身份**运行（推荐，会一并配置本地模型环境）：
 
@@ -40,6 +42,30 @@ install.bat
 pip install -r requirements.txt
 ```
 
+#### macOS
+
+需要已安装 [PopClip](https://www.popclip.app/) 与 Python 3.13+。在仓库根目录执行：
+
+```bash
+chmod +x install-mac.sh
+./install-mac.sh
+```
+
+可选：
+
+```bash
+./install-mac.sh --with-local      # 同时安装本地模型依赖
+./install-mac.sh --api-key-setup   # 交互式配置 API 密钥
+```
+
+安装完成后，选中文字并点击 PopClip 的 **instantTrans** 按钮即可翻译替换。详见 [popclip/README.md](popclip/README.md)。
+
+或手动安装在线翻译依赖：
+
+```bash
+pip3 install -r requirements.txt
+```
+
 ### 3. 配置 API 密钥（可选）
 
 #### 方案 A：在线 API（推荐，国内稳定）
@@ -51,7 +77,7 @@ pip install -r requirements.txt
 | DeepSeek | https://platform.deepseek.com/ | `DEEPSEEK_API_KEY` |
 | 硅基流动 | https://cloud.siliconflow.cn/ | `SILICONFLOW_API_KEY` |
 
-PowerShell 永久设置示例：
+PowerShell 永久设置示例（Windows）：
 
 ```powershell
 [System.Environment]::SetEnvironmentVariable('SILICONFLOW_API_KEY', 'sk-xxxxxx', 'User')
@@ -59,7 +85,17 @@ PowerShell 永久设置示例：
 [System.Environment]::SetEnvironmentVariable('DEEPSEEK_API_KEY', 'sk-xxxxxx', 'User')
 ```
 
-> 通过 `[User]` 永久设置后，下次翻译即可生效，无需重启 AHK。
+macOS 写入 `~/.zshrc` 示例：
+
+```bash
+export DEEPSEEK_API_KEY='sk-xxxxxx'
+# 或
+export SILICONFLOW_API_KEY='sk-xxxxxx'
+```
+
+也可在 macOS 上运行 `./install-mac.sh --api-key-setup`，将密钥写入 `~/.config/instanttrans/config`（PopClip 扩展会读取）。
+
+> 通过 Windows `[User]` 永久设置后，下次翻译即可生效，无需重启 AHK。
 
 > 💡 **不想注册？** 选择「自动」模式即可，程序会依次尝试 Google 与本地模型，无需配置 API 密钥。
 
@@ -76,10 +112,18 @@ pip install -r requirements-local.txt
 2. 首次使用会自动从 Hugging Face 下载模型（约 1~2 GB），之后离线可用。
 3. 命令行测试：
 
+Windows：
+
 ```shell
 echo "Hello World" | clip
 python translate.py --local
 Get-Clipboard
+```
+
+macOS：
+
+```bash
+python3 translate.py --text "Hello World" --local --stdout
 ```
 
 > 💡 可通过环境变量自定义：
@@ -88,7 +132,9 @@ Get-Clipboard
 >
 > ⚠️ 本地模型为离线运行，首次加载较慢；纯 CPU 环境下翻译速度慢于在线 API。
 
-### 选择默认翻译服务（托盘菜单）
+### 选择默认翻译服务
+
+#### Windows（托盘菜单）
 
 运行 `instantTrans_v2.ahk` 后，**右键点击任务栏托盘图标**即可选择默认翻译服务：
 
@@ -102,16 +148,26 @@ Get-Clipboard
 
 选择后会自动保存到 `config.ini`，下次启动仍生效。
 
+#### macOS（PopClip 扩展设置）
+
+安装 `install-mac.sh` 后，在 PopClip 中打开 **instantTrans** 扩展设置，可切换「翻译服务」：自动降级 / DeepSeek / 硅基流动 / Google / 本地模型。
+
 ### 4. 使用
 
-#### 方式 1：AutoHotkey 快捷键（推荐）
+#### 方式 1：划词快捷操作（推荐）
 
-需要 [AutoHotkey v2](https://www.autohotkey.com/)。运行 `instantTrans_v2.ahk`（或自行编译为 `instantTrans_v2.exe`），然后：
+**Windows** — 需要 [AutoHotkey v2](https://www.autohotkey.com/)。运行 `instantTrans_v2.ahk`（或自行编译为 `instantTrans_v2.exe`），然后：
 
 1. 选中任何文字
 2. 按 `Ctrl+Shift+]`
 3. 文字自动替换为翻译结果
 4. 右下角显示提示：**✓ 翻译完成 (服务名称)**（2.5 秒后消失）
+
+**macOS** — 需要 [PopClip](https://www.popclip.app/)。运行 `install-mac.sh` 安装扩展后：
+
+1. 选中任何文字
+2. 点击 PopClip 弹出的 **instantTrans** 按钮
+3. 文字自动替换为翻译结果
 
 #### 方式 2：命令行
 
@@ -124,6 +180,10 @@ python translate.py --deepseek
 python translate.py --siliconflow
 python translate.py --google
 python translate.py --local        # 本地模型（离线）
+
+# 直接传入文本并输出到终端（适合脚本 / PopClip）
+python translate.py --text "Hello" --stdout
+python translate.py --text "你好" --deepseek --stdout
 ```
 
 ## 📋 支持的翻译 API
@@ -135,11 +195,12 @@ python translate.py --local        # 本地模型（离线）
 | **Google** | ❌ 免费 | ✅ 稳定 | 🐢 较慢 | ⭐⭐⭐ | ⭐⭐⭐ |
 | **本地模型 (HY-MT1.5)** | ❌ 离线 | ✅ 无需联网 | 🐢 取决于硬件 | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 
-## 🎯 快捷键
+## 🎯 快捷键 / 操作
 
-| 快捷键 | 功能 |
-|--------|------|
-| `Ctrl+Shift+]` | 翻译选中文字并替换 |
+| 平台 | 操作 | 功能 |
+|------|------|------|
+| Windows | `Ctrl+Shift+]` | 翻译选中文字并替换 |
+| macOS | PopClip → instantTrans | 翻译选中文字并替换 |
 
 ## 💡 使用提示
 
@@ -165,7 +226,8 @@ python translate.py --local        # 本地模型（离线）
 **解决**：
 
 - **命令行**：使用 `--local`、`--deepseek`、`--siliconflow` 或 `--google` 参数
-- **AutoHotkey**：托盘右键选择默认服务，或在「自动」模式下按 DeepSeek → 硅基流动 → Google → 本地模型 顺序降级
+- **Windows AutoHotkey**：托盘右键选择默认服务，或在「自动」模式下按 DeepSeek → 硅基流动 → Google → 本地模型 顺序降级
+- **macOS PopClip**：在扩展设置中切换「翻译服务」
 
 ### Q: 翻译质量如何选择？
 
@@ -174,6 +236,14 @@ python translate.py --local        # 本地模型（离线）
 - **高质量**：配置 DeepSeek 或硅基流动 API 密钥，或使用「自动」模式
 - **离线 / 兜底**：本地模型（自动模式下为最后兜底方案）
 - **零配置**：选择「自动」或「Google 翻译」，无需 API 密钥
+
+### Q: macOS 上 PopClip 提示未安装？
+
+**解决**：在仓库根目录运行 `./install-mac.sh`，确保 `~/.config/instanttrans/config` 存在且路径正确。
+
+### Q: macOS 发布包如何获取？
+
+**解决**：在 [Releases](https://github.com/aaronfang/instantTrans/releases) 下载 `instantTrans-macos-*.zip`，解压后执行 `./install-mac.sh`。也可在 macOS 上运行 `scripts/build-macos-release.sh` 自行打包。
 
 ## 📦 依赖
 

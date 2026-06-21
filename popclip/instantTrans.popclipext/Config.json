@@ -1,0 +1,21 @@
+{
+  "identifier": "com.github.aaronfang.instantTrans",
+  "popclipVersion": 4151,
+  "name": "instantTrans",
+  "icon": "iconify:mdi:translate",
+  "description": "中英互译，基于 instantTrans 项目",
+  "requirements": ["text"],
+  "options": [
+    {
+      "identifier": "service",
+      "type": "multiple",
+      "label": "翻译服务",
+      "values": ["auto", "deepseek", "siliconflow", "google", "local"],
+      "valueLabels": ["自动降级", "DeepSeek", "硅基流动", "Google", "本地模型"],
+      "defaultValue": "auto"
+    }
+  ],
+  "shellScriptFile": "translate.sh",
+  "interpreter": "/bin/zsh",
+  "after": "paste-result"
+}

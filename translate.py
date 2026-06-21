@@ -166,6 +166,28 @@ def translate_text_auto(text: str) -> tuple[str, str]:
             last_error = e
     raise last_error or RuntimeError("所有翻译方案均不可用")
 
+def _read_input_text(args: argparse.Namespace) -> str:
+    import sys
+
+    if args.stdin:
+        return sys.stdin.read()
+    if args.text is not None:
+        return args.text
+    import pyperclip
+
+    return pyperclip.paste()
+
+def _translate_with_service(text: str, args: argparse.Namespace) -> tuple[str, str]:
+    if args.local:
+        return translate_text_local(text), "Local"
+    if args.google:
+        return translate_text_google(text), "Google"
+    if args.deepseek:
+        return translate_text_deepseek(text), "DeepSeek"
+    if args.siliconflow:
+        return translate_text_siliconflow(text), "SiliconFlow"
+    return translate_text_auto(text)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--check-local", action="store_true", help="检查本地模型环境与缓存状态")
@@ -174,6 +196,9 @@ if __name__ == "__main__":
     parser.add_argument("--google", action="store_true", help="使用Google翻译（无需API密钥）")
     parser.add_argument("--deepseek", action="store_true", help="使用DeepSeek API（推荐）")
     parser.add_argument("--siliconflow", action="store_true", help="使用硅基流动API（国内免费）")
+    parser.add_argument("--text", type=str, help="待翻译文本；省略则从剪贴板读取")
+    parser.add_argument("--stdin", action="store_true", help="从标准输入读取待翻译文本")
+    parser.add_argument("--stdout", action="store_true", help="将译文输出到标准输出（供 PopClip 等调用）")
     args = parser.parse_args()
 
     if args.check_local:
@@ -194,31 +219,27 @@ if __name__ == "__main__":
             _print_local_status()
         raise SystemExit(0)
 
-    import pyperclip
-
-    text = pyperclip.paste()
-    used_api = ""
+    text = _read_input_text(args)
 
     try:
-        if args.local:
-            translated_text = translate_text_local(text)
-            used_api = "Local"
-        elif args.google:
-            translated_text = translate_text_google(text)
-            used_api = "Google"
-        elif args.deepseek:
-            translated_text = translate_text_deepseek(text)
-            used_api = "DeepSeek"
-        elif args.siliconflow:
-            translated_text = translate_text_siliconflow(text)
-            used_api = "SiliconFlow"
-        else:
-            translated_text, used_api = translate_text_auto(text)
-        
-        # 将翻译结果和使用的API信息都复制到剪贴板（用特殊分隔符）
+        translated_text, used_api = _translate_with_service(text, args)
+
+        if args.stdout:
+            print(translated_text, end="")
+            raise SystemExit(0)
+
+        import pyperclip
+
         pyperclip.copy(f"{translated_text}|||{used_api}")
-        
+
     except Exception as e:
-        # 如果所有翻译都失败，输出错误信息
+        import sys
+
+        if args.stdout:
+            print(f"翻译失败: {e}", file=sys.stderr)
+            raise SystemExit(1)
+
+        import pyperclip
+
         print(f"翻译失败: {e}")
         pyperclip.copy(f"{text}|||ERROR:{e}")
