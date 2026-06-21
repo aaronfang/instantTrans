@@ -1,0 +1,8 @@
+# 本地模型翻译额外依赖（HY-MT1.5-1.8B-ONNX）
+# 安装命令：pip install -r requirements-local.txt
+
+onnxruntime>=1.17.0
+transformers>=4.45.0
+torch
+sentencepiece
+huggingface_hub>=0.26.0

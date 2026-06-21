@@ -1,29 +1,55 @@
-# .gitignore
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 *.so
 *.egg
 *.egg-info/
+.Python
+*.orig
+*.rej
+
+# 虚拟环境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# 构建 / 打包
 dist/
 build/
 *.tar.gz
+
+# instantTrans 运行时生成
+config.ini
+
+# 本地模型（约 1~2 GB，由 install.bat 或托盘菜单自动下载）
+models/
+.cache/
+.huggingface/
+
+# AutoHotkey 编译产物
+*.exe
+
+# 日志与临时文件
 *.log
-*.pot
-*.pyc
-*.pyo
-*.orig
-*.rej
-*.swp
-*.DS_Store
-.ipynb_checkpoints/
+*.tmp
+*.temp
+*.stackdump
+
+# 编辑器
 .vscode/
 .idea/
+*.swp
+.ipynb_checkpoints/
+
+# 操作系统
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 数据库
 *.sqlite3
