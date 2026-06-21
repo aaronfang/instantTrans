@@ -8,6 +8,15 @@ $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $Dist = Join-Path $Root "dist"
 $Name = "instantTrans"
 
+function Normalize-ShellScripts {
+    param([string]$Directory)
+    Get-ChildItem -Path $Directory -Recurse -Filter "*.sh" -File | ForEach-Object {
+        $text = [IO.File]::ReadAllText($_.FullName) -replace "`r`n", "`n" -replace "`r", "`n"
+        $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+        [IO.File]::WriteAllText($_.FullName, $text, $utf8NoBom)
+    }
+}
+
 if (-not $Version) {
     $tag = git -C $Root describe --tags --abbrev=0 2>$null
     if ($tag) {
@@ -28,14 +37,22 @@ New-Item -ItemType Directory -Force -Path $Dist | Out-Null
 Remove-Item -Force -ErrorAction SilentlyContinue $SrcZip, $ExtZip
 
 Write-Host "==> 打包源码: $SrcZip"
+$TempSrc = Join-Path $env:TEMP "instantTrans-src-$([guid]::NewGuid().ToString())"
+New-Item -ItemType Directory -Force -Path $TempSrc | Out-Null
 Push-Location $Root
 git archive --format=zip "--prefix=${ReleaseName}/" -o $SrcZip HEAD
 Pop-Location
+Expand-Archive -Path $SrcZip -DestinationPath $TempSrc -Force
+Remove-Item -Force $SrcZip
+Normalize-ShellScripts -Directory $TempSrc
+Compress-Archive -Path (Join-Path $TempSrc $ReleaseName) -DestinationPath $SrcZip -Force
+Remove-Item -Recurse -Force $TempSrc
 
 Write-Host "==> 打包 PopClip 扩展: $ExtZip"
 $TempExt = Join-Path $env:TEMP "instantTrans-ext-$([guid]::NewGuid().ToString())"
 New-Item -ItemType Directory -Force -Path $TempExt | Out-Null
 Copy-Item -Recurse -Force $ExtDir (Join-Path $TempExt "instantTrans.popclipext")
+Normalize-ShellScripts -Directory (Join-Path $TempExt "instantTrans.popclipext")
 $ExtZipTemp = Join-Path $Dist "${ReleaseName}.popclipextz.zip"
 Compress-Archive -Path (Join-Path $TempExt "instantTrans.popclipext") -DestinationPath $ExtZipTemp -Force
 Move-Item -Force $ExtZipTemp $ExtZip

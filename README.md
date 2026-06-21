@@ -58,6 +58,9 @@ chmod +x install-mac.sh
 ./install-mac.sh --api-key-setup   # 交互式配置 API 密钥
 ```
 
+> 若出现 `bad interpreter: /bin/bash^M`，说明脚本为 Windows 换行符，请执行：
+> `sed -i '' 's/\r$//' install-mac.sh` 后重试，或下载最新 Release 包。
+
 安装完成后，选中文字并点击 PopClip 的 **instantTrans** 按钮即可翻译替换。详见 [popclip/README.md](popclip/README.md)。
 
 或手动安装在线翻译依赖：
@@ -240,6 +243,17 @@ python translate.py --text "你好" --deepseek --stdout
 ### Q: macOS 上 PopClip 提示未安装？
 
 **解决**：在仓库根目录运行 `./install-mac.sh`，确保 `~/.config/instanttrans/config` 存在且路径正确。
+
+### Q: macOS 运行 install-mac.sh 报 `bad interpreter: /bin/bash^M`？
+
+**解决**：脚本被保存为 Windows 换行符（CRLF）。在脚本所在目录执行：
+
+```bash
+sed -i '' 's/\r$//' install-mac.sh popclip/instantTrans.popclipext/translate.sh
+chmod +x install-mac.sh
+```
+
+或重新下载已修复换行符的最新 Release 包。
 
 ### Q: macOS 发布包如何获取？
 
