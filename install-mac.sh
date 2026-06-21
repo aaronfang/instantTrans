@@ -24,7 +24,7 @@ instantTrans macOS 安装脚本
 
 前置条件:
   - macOS
-  - Python 3.13+
+  - Python 3.13+（在线翻译）；本地模型需 Python 3.13（3.14 暂不支持）
   - 已安装 PopClip (https://www.popclip.app/)
 EOF
 }
@@ -36,6 +36,50 @@ log() {
 die() {
   printf '错误: %s\n' "$*" >&2
   exit 1
+}
+
+find_python313() {
+  local candidate
+  for candidate in \
+    python3.13 \
+    /opt/homebrew/opt/python@3.13/bin/python3.13 \
+    /usr/local/opt/python@3.13/bin/python3.13; do
+    if command -v "$candidate" >/dev/null 2>&1 \
+      && "$candidate" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 13) else 1)'; then
+      printf '%s' "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+resolve_python() {
+  PYTHON="$(command -v python3)"
+  local minor
+  minor="$("$PYTHON" -c 'import sys; print(sys.version_info.minor)')"
+
+  if [[ "$WITH_LOCAL" -eq 1 && "$minor" -ge 14 ]]; then
+    local py313
+    if py313="$(find_python313)"; then
+      log "Python 3.14 暂不支持本地模型依赖（transformers 尚无兼容包），已切换至: ${py313}"
+      PYTHON="$py313"
+      return
+    fi
+    die "$(cat <<EOF
+本地模型暂不支持 Python 3.14（transformers / torch 尚无 cp314 包）。
+
+请安装 Python 3.13 后重试:
+  brew install python@3.13
+  PATH="/opt/homebrew/opt/python@3.13/bin:\$PATH" ./install-mac.sh --with-local
+
+或省略 --with-local，仅安装在线翻译（PopClip 自动模式仍可用）。
+EOF
+)"
+  fi
+
+  if ! "$PYTHON" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 13) else 1)'; then
+    die "需要 Python 3.13 或更高版本"
+  fi
 }
 
 for arg in "$@"; do
@@ -56,12 +100,8 @@ done
 
 command -v python3 >/dev/null || die "未找到 python3，请先安装 Python 3.13+"
 
-PYTHON="$(command -v python3)"
+resolve_python
 log "使用 Python: ${PYTHON}"
-
-if ! "$PYTHON" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 13) else 1)'; then
-  die "需要 Python 3.13 或更高版本"
-fi
 
 if [[ ! -d "/Applications/PopClip.app" ]]; then
   log "警告: 未在 /Applications 找到 PopClip.app，请确认已安装 PopClip"

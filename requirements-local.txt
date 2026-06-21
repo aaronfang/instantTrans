@@ -1,5 +1,6 @@
 # 本地模型翻译额外依赖（HY-MT1.5-1.8B-ONNX）
 # 安装命令：pip install -r requirements-local.txt
+# 注意：transformers / torch 暂不支持 Python 3.14，本地模型请使用 Python 3.13
 
 onnxruntime>=1.17.0
 transformers>=4.45.0

@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 #### macOS
 
-需要已安装 [PopClip](https://www.popclip.app/) 与 Python 3.13+。在仓库根目录执行：
+需要已安装 [PopClip](https://www.popclip.app/) 与 Python 3.13+。本地模型（`--with-local`）目前需 **Python 3.13**（3.14 暂不支持 `transformers`）。在仓库根目录执行：
 
 ```bash
 chmod +x install-mac.sh
@@ -243,6 +243,17 @@ python translate.py --text "你好" --deepseek --stdout
 ### Q: macOS 上 PopClip 提示未安装？
 
 **解决**：在仓库根目录运行 `./install-mac.sh`，确保 `~/.config/instanttrans/config` 存在且路径正确。
+
+### Q: macOS 安装本地模型报 `No matching distribution found for transformers`？
+
+**解决**：你很可能在使用 **Python 3.14**。`transformers` / `torch` 尚无 Python 3.14 的 PyPI 包。请安装 Python 3.13：
+
+```bash
+brew install python@3.13
+PATH="/opt/homebrew/opt/python@3.13/bin:$PATH" ./install-mac.sh --with-local
+```
+
+或省略 `--with-local`，仅使用在线翻译（自动模式会降级到 Google，无需本地模型）。
 
 ### Q: macOS 运行 install-mac.sh 报 `bad interpreter: /bin/bash^M`？
 
