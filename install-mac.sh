@@ -158,7 +158,11 @@ log "安装 PopClip 扩展..."
 mkdir -p "$(dirname "$EXT_DEST")"
 rm -rf "$EXT_DEST"
 cp -R "$EXT_SRC" "$EXT_DEST"
-chmod +x "${EXT_DEST}/translate.sh"
+chmod +x \
+  "${EXT_DEST}/translate.sh" \
+  "${EXT_DEST}/polish.sh" \
+  "${EXT_DEST}/suggest-reply.sh" \
+  "${EXT_DEST}/writing-common.sh"
 
 defaults write com.pilotmoon.popclip LoadUnsignedExtensions -bool YES >/dev/null 2>&1 || true
 
@@ -176,15 +180,16 @@ cat <<EOF
 
 使用方式:
   1. 在任意应用中选中文字
-  2. 点击 PopClip 弹出的「instantTrans」按钮
-  3. 选中文字将自动替换为译文
+  2. 点击 PopClip 弹出的「翻译」「润色」或「建议回复」
+  3. 翻译和润色会替换选中文字
+  4. 建议回复会显示 3 条候选；选择后只复制到剪贴板，不会自动发送
 
 配置:
   - 项目路径: ${SCRIPT_DIR}
   - 运行时配置: ${CONFIG_FILE}
   - PopClip 扩展: ${EXT_DEST}
 
-在 PopClip 扩展设置中可切换「翻译服务」。
+在 PopClip 扩展设置中可切换翻译服务、润色风格、回复意图和写作服务。
 如需配置 API 密钥，可重新运行:
   ./install-mac.sh --api-key-setup
 

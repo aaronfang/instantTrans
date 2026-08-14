@@ -3,7 +3,7 @@
   "popclipVersion": 4151,
   "name": "instantTrans",
   "icon": "iconify:mdi:translate",
-  "description": "中英互译，基于 instantTrans 项目",
+  "description": "翻译、润色选中文字，并根据选中的聊天上下文生成建议回复",
   "requirements": ["text"],
   "options": [
     {
@@ -13,9 +13,53 @@
       "values": ["auto", "deepseek", "siliconflow", "google", "local"],
       "valueLabels": ["自动降级", "DeepSeek", "硅基流动", "Google", "本地模型"],
       "defaultValue": "auto"
+    },
+    {
+      "identifier": "writingProvider",
+      "type": "multiple",
+      "label": "润色/回复服务",
+      "values": ["auto", "deepseek", "siliconflow"],
+      "valueLabels": ["自动降级", "DeepSeek", "硅基流动"],
+      "defaultValue": "auto"
+    },
+    {
+      "identifier": "polishStyle",
+      "type": "multiple",
+      "label": "润色风格",
+      "values": ["natural", "concise", "professional", "friendly", "persuasive"],
+      "valueLabels": ["自然", "简洁", "专业", "友好", "有说服力"],
+      "defaultValue": "natural"
+    },
+    {
+      "identifier": "replyIntent",
+      "type": "multiple",
+      "label": "回复意图",
+      "values": ["auto", "agree", "continue", "humorous", "polite", "decline", "empathetic"],
+      "valueLabels": ["自动判断", "赞同", "继续话题", "幽默", "礼貌", "婉拒", "共情"],
+      "defaultValue": "auto"
     }
   ],
-  "shellScriptFile": "translate.sh",
   "interpreter": "/bin/zsh",
-  "after": "paste-result"
+  "actions": [
+    {
+      "title": "翻译",
+      "icon": "iconify:mdi:translate",
+      "requirements": ["text", "paste"],
+      "shellScriptFile": "translate.sh",
+      "after": "paste-result"
+    },
+    {
+      "title": "润色",
+      "icon": "iconify:mdi:auto-fix",
+      "requirements": ["text", "paste"],
+      "shellScriptFile": "polish.sh",
+      "after": "paste-result"
+    },
+    {
+      "title": "建议回复",
+      "icon": "iconify:mdi:message-reply-text",
+      "requirements": ["text"],
+      "shellScriptFile": "suggest-reply.sh"
+    }
+  ]
 }

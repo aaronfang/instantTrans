@@ -1,6 +1,10 @@
 # PopClip 扩展
 
-instantTrans 的 macOS [PopClip](https://www.popclip.app/) 扩展，实现划词翻译并替换选中文字。
+instantTrans 的 macOS [PopClip](https://www.popclip.app/) 扩展，支持：
+
+- 翻译选中文字并替换原选区
+- 按指定风格润色文字并替换原选区
+- 根据明确选中的聊天上下文生成 3 条建议回复
 
 ## 一键安装（推荐）
 
@@ -34,10 +38,26 @@ chmod +x install-mac.sh
 ## 使用
 
 1. 选中任意文字
-2. 点击 PopClip 的 **instantTrans** 按钮
-3. 选中内容将替换为译文
+2. 点击 PopClip 中需要的操作：
+   - **翻译**：将选中内容替换为译文
+   - **润色**：将选中内容替换为润色结果
+   - **建议回复**：显示 3 条候选回复
+3. 建议回复只有在选择候选项后才会复制到剪贴板，需要手动粘贴并确认发送
 
-在 PopClip 扩展设置中可切换「翻译服务」：自动降级 / DeepSeek / 硅基流动 / Google / 本地模型。
+建议回复只会把本次明确选中的聊天文字发送给模型，不会读取未选中的窗口内容，也不会自动发送消息。
+
+润色和建议回复需要配置 DeepSeek 或硅基流动 API 密钥。可运行：
+
+```bash
+./install-mac.sh --api-key-setup
+```
+
+在 PopClip 扩展设置中可以配置：
+
+- **翻译服务**：自动降级 / DeepSeek / 硅基流动 / Google / 本地模型
+- **润色/回复服务**：自动降级 / DeepSeek / 硅基流动
+- **润色风格**：自然 / 简洁 / 专业 / 友好 / 有说服力
+- **回复意图**：自动判断 / 赞同 / 继续话题 / 幽默 / 礼貌 / 婉拒 / 共情
 
 ## 文件说明
 
@@ -45,6 +65,9 @@ chmod +x install-mac.sh
 |------|------|
 | `Config.json` | PopClip 扩展配置 |
 | `translate.sh` | 调用 `translate.py --text ... --stdout` |
+| `polish.sh` | 调用统一写作引擎润色文字 |
+| `suggest-reply.sh` | 生成候选回复并打开 macOS 选择窗口 |
+| `popclip_runner.py` | PopClip 与 `assistant_engine.py` 之间的桥接程序 |
 
 ## 调试
 

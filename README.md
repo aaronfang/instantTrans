@@ -63,7 +63,7 @@ chmod +x install-mac.sh
 > 若出现 `bad interpreter: /bin/bash^M`，说明脚本为 Windows 换行符，请执行：
 > `sed -i '' 's/\r$//' install-mac.sh` 后重试，或下载最新 Release 包。
 
-安装完成后，选中文字并点击 PopClip 的 **instantTrans** 按钮即可翻译替换。详见 [popclip/README.md](popclip/README.md)。
+安装完成后，PopClip 会提供 **翻译、润色、建议回复** 三个操作。详见 [popclip/README.md](popclip/README.md)。
 
 或手动安装在线翻译依赖：
 
@@ -155,7 +155,7 @@ python3 translate.py --text "Hello World" --local --stdout
 
 #### macOS（PopClip 扩展设置）
 
-安装 `install-mac.sh` 后，在 PopClip 中打开 **instantTrans** 扩展设置，可切换「翻译服务」：自动降级 / DeepSeek / 硅基流动 / Google / 本地模型。
+安装 `install-mac.sh` 后，在 PopClip 中打开 **instantTrans** 扩展设置，可以配置翻译服务、润色/回复服务、润色风格和回复意图。
 
 ### 4. 使用
 
@@ -190,8 +190,11 @@ Windows 托盘右键菜单中的“显示系统通知”可以关闭完成、复
 **macOS** — 需要 [PopClip](https://www.popclip.app/)。运行 `install-mac.sh` 安装扩展后：
 
 1. 选中任何文字
-2. 点击 PopClip 弹出的 **instantTrans** 按钮
-3. 文字自动替换为翻译结果
+2. 点击 PopClip 弹出的 **翻译**、**润色**或**建议回复**
+3. 翻译和润色会替换原选区
+4. 建议回复会显示 3 条候选；选择后只复制到剪贴板，需要手动粘贴并确认发送
+
+润色和建议回复需要 DeepSeek 或硅基流动。建议回复只会使用本次明确选中的聊天文字，不读取其他窗口内容，也不会自动发送。
 
 #### 方式 2：命令行
 
@@ -224,7 +227,7 @@ python translate.py --text "你好" --deepseek --stdout
 | 平台 | 操作 | 功能 |
 |------|------|------|
 | Windows | 鼠标拖选 / 双击文字 | 显示翻译、润色、回复工具条 |
-| macOS | PopClip → instantTrans | 翻译选中文字并替换 |
+| macOS | PopClip → 翻译 / 润色 / 建议回复 | 替换翻译或润色结果；选择并复制建议回复 |
 
 ## 💡 使用提示
 
@@ -251,7 +254,7 @@ python translate.py --text "你好" --deepseek --stdout
 
 - **命令行**：使用 `--local`、`--deepseek`、`--siliconflow` 或 `--google` 参数
 - **Windows AutoHotkey**：托盘右键选择默认服务，或在「自动」模式下按 DeepSeek → 硅基流动 → Google → 本地模型 顺序降级
-- **macOS PopClip**：在扩展设置中切换「翻译服务」
+- **macOS PopClip**：在扩展设置中切换翻译服务、写作服务、润色风格或回复意图
 
 ### Q: 翻译质量如何选择？
 
