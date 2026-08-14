@@ -128,7 +128,7 @@ if exist "%project_path%instantTrans_v2.exe" (
 
 echo.
 echo ===== 安装完成 =====
-echo 快捷键: Ctrl+Shift+]
+echo 使用方式: 鼠标拖选或双击文字，在指针附近使用划词工具条
 echo 翻译服务: 托盘右键可切换（自动 / DeepSeek / 硅基流动 / Google / 本地模型）
 echo 本地模型: models\HY-MT1.5-1.8B-ONNX
 echo 在线 API : 可选设置 SILICONFLOW_API_KEY 或 DEEPSEEK_API_KEY

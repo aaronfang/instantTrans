@@ -1,7 +1,9 @@
 # instantTrans
 
 > - 支持**免费 AI 翻译 API**：DeepSeek、硅基流动（SiliconFlow）  
+> - 鼠标选中文字后，在指针附近显示**翻译 / 润色 / 回复**工具条
 > - 把选中的文字快速**中英互译**，并替换之前选中的文字  
+> - 支持多种风格润色，以及根据选中的聊天上下文生成 3 条建议回复
 > - AI 翻译支持双向翻译，自动识别语言  
 > - 兼容 Python 3.13+ / 3.14  
 > - 支持 **Windows**（AutoHotkey）与 **macOS**（PopClip）
@@ -13,7 +15,7 @@
 - 🖱️ **托盘 / PopClip 菜单**：Windows 任务栏托盘或 macOS PopClip 中切换默认翻译服务
 - 🔄 **智能降级**：DeepSeek → 硅基流动 → Google → 本地模型，失败时自动切换
 - 🆓 **完全免费**：所有方案都免费可用
-- ⚡ **快捷操作**：Windows `Ctrl+Shift+]` / macOS PopClip 一键翻译并替换
+- 🖱️ **划词工具条**：Windows 中鼠标拖选文字后直接选择翻译、润色或建议回复
 - 🌍 **智能互译**：自动识别中英文并翻译为对应语言
 - 💡 **即时反馈**：翻译后显示使用的服务（Windows 2.5 秒提示）
 
@@ -159,12 +161,23 @@ python3 translate.py --text "Hello World" --local --stdout
 
 #### 方式 1：划词快捷操作（推荐）
 
-**Windows** — 需要 [AutoHotkey v2](https://www.autohotkey.com/)。运行 `instantTrans_v2.ahk`（或自行编译为 `instantTrans_v2.exe`），然后：
+**Windows** — 需要 [AutoHotkey v2](https://www.autohotkey.com/)。开发版请运行 `instantTrans_v2.ahk`；
+仓库中已有的 `instantTrans_v2.exe` 不包含本次源码改动，使用前需要重新编译，然后：
 
 1. 选中任何文字
-2. 按 `Ctrl+Shift+]`
-3. 文字自动替换为翻译结果
-4. 右下角显示提示：**✓ 翻译完成 (服务名称)**（2.5 秒后消失）
+2. 松开鼠标后，指针附近会显示「翻译 / 润色 / 回复」工具条
+3. 点击「翻译」或「润色」，结果会尝试替换原选区
+4. 选择聊天上下文后点击「回复」，会显示 3 条候选回复；点击候选旁的「复制」后手动粘贴到输入框
+5. 可以在建议回复窗口填写“我想表达什么”，点击“重新生成”细化回复方向
+
+润色与建议回复需要 DeepSeek 或硅基流动。若当前翻译服务是 Google 或本地模型，
+工具会自动尝试已配置的 DeepSeek / 硅基流动服务。
+
+Windows 托盘右键菜单中的“显示系统通知”可以关闭完成、复制、服务切换等系统通知；
+处理进度和错误信息仍会保留，避免操作失败时没有反馈。
+
+> Windows 无法像浏览器一样收到所有软件的文字选区事件。当前版本支持鼠标拖选和双击选词；
+> 使用键盘 `Shift + 方向键` 形成的选区不会自动显示工具条。
 
 **macOS** — 需要 [PopClip](https://www.popclip.app/)。运行 `install-mac.sh` 安装扩展后：
 
@@ -202,7 +215,7 @@ python translate.py --text "你好" --deepseek --stdout
 
 | 平台 | 操作 | 功能 |
 |------|------|------|
-| Windows | `Ctrl+Shift+]` | 翻译选中文字并替换 |
+| Windows | 鼠标拖选 / 双击文字 | 显示翻译、润色、回复工具条 |
 | macOS | PopClip → instantTrans | 翻译选中文字并替换 |
 
 ## 💡 使用提示
