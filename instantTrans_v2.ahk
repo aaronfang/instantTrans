@@ -32,7 +32,10 @@ lastStatusCheckTick := 0
 
 ; 划词工具条状态
 selectionToolbarEnabled := IniRead(configFile, "Settings", "SelectionToolbar", "1") != "0"
+doubleClickSelectionEnabled := IniRead(configFile, "Settings", "DoubleClickSelection", "0") != "0"
+textCursorOnly := IniRead(configFile, "Settings", "TextCursorOnly", "1") != "0"
 notificationsEnabled := IniRead(configFile, "Settings", "Notifications", "1") != "0"
+excludedApps := IniRead(configFile, "Settings", "ExcludedApps", "")
 selectionContext := Map()
 selectionToolbarGui := 0
 replyPanelGui := 0
@@ -45,6 +48,8 @@ mouseDownX := 0
 mouseDownY := 0
 mouseDownHwnd := 0
 mouseDownTick := 0
+mouseDownCursor := ""
+lastInteractionProcess := ""
 lastClickX := 0
 lastClickY := 0
 lastClickTick := 0
@@ -104,7 +109,8 @@ BuildLocalModelSubmenu() {
 BuildTrayMenu() {
     global services, defaultService, localDepsReady, localModelCached, localServiceRunning
     global localModelLoaded, localStatusHints, localStatusChecked
-    global selectionToolbarEnabled, notificationsEnabled
+    global selectionToolbarEnabled, doubleClickSelectionEnabled, textCursorOnly
+    global notificationsEnabled
     tray := A_TrayMenu
     tray.Delete()
 
@@ -138,6 +144,13 @@ BuildTrayMenu() {
     tray.Add("启用划词工具条", ToggleSelectionToolbar)
     if selectionToolbarEnabled
         tray.Check("启用划词工具条")
+    tray.Add("双击选词时显示", ToggleDoubleClickSelection)
+    if doubleClickSelectionEnabled
+        tray.Check("双击选词时显示")
+    tray.Add("仅在文本光标处触发", ToggleTextCursorOnly)
+    if textCursorOnly
+        tray.Check("仅在文本光标处触发")
+    tray.Add("暂停/恢复最近使用的应用", ToggleRecentAppExclusion)
     tray.Add("显示系统通知", ToggleNotifications)
     if notificationsEnabled
         tray.Check("显示系统通知")
@@ -153,6 +166,49 @@ ToggleSelectionToolbar(*) {
     IniWrite(selectionToolbarEnabled ? "1" : "0", configFile, "Settings", "SelectionToolbar")
     HideSelectionToolbar()
     BuildTrayMenu()
+}
+
+ToggleDoubleClickSelection(*) {
+    global doubleClickSelectionEnabled, configFile
+    doubleClickSelectionEnabled := !doubleClickSelectionEnabled
+    IniWrite(
+        doubleClickSelectionEnabled ? "1" : "0",
+        configFile,
+        "Settings",
+        "DoubleClickSelection"
+    )
+    HideSelectionToolbar()
+    BuildTrayMenu()
+}
+
+ToggleTextCursorOnly(*) {
+    global textCursorOnly, configFile
+    textCursorOnly := !textCursorOnly
+    IniWrite(textCursorOnly ? "1" : "0", configFile, "Settings", "TextCursorOnly")
+    HideSelectionToolbar()
+    BuildTrayMenu()
+}
+
+ToggleRecentAppExclusion(*) {
+    global lastInteractionProcess, excludedApps, configFile
+    processName := StrLower(Trim(lastInteractionProcess))
+    if !processName {
+        ShowSystemNotification("没有可切换的最近应用", 2, 2200)
+        return
+    }
+
+    items := ParseExcludedApps(excludedApps)
+    if items.Has(processName) {
+        items.Delete(processName)
+        action := "已恢复"
+    } else {
+        items[processName] := true
+        action := "已暂停"
+    }
+    excludedApps := JoinMapKeys(items, "|")
+    IniWrite(excludedApps, configFile, "Settings", "ExcludedApps")
+    HideSelectionToolbar()
+    ShowSystemNotification(action . " " . processName . " 中的划词工具条", 1, 2500)
 }
 
 ToggleNotifications(*) {
@@ -543,18 +599,29 @@ BuildActionMenus() {
 }
 
 ~LButton:: {
-    global mouseDownX, mouseDownY, mouseDownHwnd, mouseDownTick
+    global mouseDownX, mouseDownY, mouseDownHwnd, mouseDownTick, mouseDownCursor
+    global lastInteractionProcess
     MouseGetPos(&mouseDownX, &mouseDownY, &mouseDownHwnd)
-    if IsInstantTransHwnd(mouseDownHwnd)
+    if IsInstantTransHwnd(mouseDownHwnd) {
+        mouseDownTick := 0
         return
+    }
+    try lastInteractionProcess := StrLower(WinGetProcessName("ahk_id " . mouseDownHwnd))
+    if IsProcessExcluded(lastInteractionProcess) {
+        mouseDownTick := 0
+        HideSelectionToolbar()
+        return
+    }
+    mouseDownCursor := A_Cursor
     mouseDownTick := A_TickCount
 }
 
 ~LButton Up:: {
-    global selectionToolbarEnabled, mouseDownX, mouseDownY, mouseDownHwnd
-    global lastClickX, lastClickY, lastClickTick
+    global selectionToolbarEnabled, textCursorOnly
+    global mouseDownX, mouseDownY, mouseDownHwnd, mouseDownTick, mouseDownCursor
+    global doubleClickSelectionEnabled, lastClickX, lastClickY, lastClickTick
 
-    if !selectionToolbarEnabled || IsInstantTransWindow()
+    if !selectionToolbarEnabled || !mouseDownTick || IsInstantTransWindow()
         return
 
     MouseGetPos(&x, &y, &hwnd)
@@ -567,7 +634,13 @@ BuildActionMenus() {
     lastClickY := y
     lastClickTick := A_TickCount
 
-    if moved || doubleClicked {
+    isTextCursor := StrLower(mouseDownCursor) = "ibeam" || StrLower(A_Cursor) = "ibeam"
+    if textCursorOnly && !isTextCursor {
+        HideSelectionToolbar()
+        return
+    }
+
+    if moved || (doubleClickSelectionEnabled && doubleClicked) {
         SetTimer(() => ProbeSelection(mouseDownHwnd, x, y), -120)
     } else {
         HideSelectionToolbar()
@@ -612,10 +685,11 @@ ProbeSelection(sourceHwnd, mouseX, mouseY) {
     A_Clipboard := ""
     Send "^c"
     copied := ClipWait(0.45, true)
+    copiedFiles := DllCall("IsClipboardFormatAvailable", "UInt", 15) ; CF_HDROP
     text := copied ? A_Clipboard : ""
     A_Clipboard := backup
 
-    if !copied || !Trim(text) || StrLen(text) > 12000 {
+    if copiedFiles || !copied || !Trim(text) || StrLen(text) > 12000 {
         HideSelectionToolbar()
         return
     }
@@ -964,6 +1038,30 @@ IsSensitiveSelectionSource(windowHwnd) {
         }
     }
     return false
+}
+
+IsProcessExcluded(processName) {
+    global excludedApps
+    name := StrLower(Trim(processName))
+    return name && ParseExcludedApps(excludedApps).Has(name)
+}
+
+ParseExcludedApps(value) {
+    items := Map()
+    for item in StrSplit(value, "|") {
+        name := StrLower(Trim(item))
+        if name
+            items[name] := true
+    }
+    return items
+}
+
+JoinMapKeys(items, separator) {
+    values := []
+    for key in items
+        values.Push(key)
+    values.Sort()
+    return JoinStrings(values, separator)
 }
 
 GetReplacementMode(controlHwnd) {
